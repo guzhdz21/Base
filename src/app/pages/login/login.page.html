@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title class="centrar">Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-avatar>
+    <img src="/assets/images/Logo.JPG">
+  </ion-avatar>
+
+  <ion-item color="primary" class="linea"></ion-item>
+
+  <ion-item lines="none">
+    <ion-buttons slot="start">
+      <ion-button slot="icon-only">
+        <ion-icon name="information-circle" color="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-input type="number" placeholder="Numero Empleado"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-buttons slot="start">
+      <ion-button slot="icon-only">
+        <ion-icon name="information-circle" color="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-input [type]="passwordV" placeholder="Contraseña"></ion-input>
+
+    <ion-buttons slot="end">
+      <ion-button slot="icon-only" (click)="passwordVisible()">
+        <ion-icon [name]="visible" color="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <p></p>
+  <ion-item lines="none">
+    <ion-label class="centrar"><a href="">¿Olvidaste tu contraseña?</a></ion-label>
+  </ion-item>
+
+  <ion-button class="centrari boton1">Ingresar</ion-button>
+
+</ion-content>

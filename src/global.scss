@@ -24,3 +24,15 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.centrar
+{
+  text-align: center;
+}
+
+.centrari
+{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
