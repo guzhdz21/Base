@@ -36,3 +36,16 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.alert-head.sc-ion-alert-md {
+  background-color: var(--ion-color-primary) !important;
+  margin-bottom: 5%;
+}
+
+.alert-title.sc-ion-alert-md {
+  color: white !important;
+}
+.explicacion {
+  color: var(--ion-color-medium) !important;
+  text-align: center;
+}

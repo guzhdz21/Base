@@ -11,37 +11,46 @@
 
   <ion-item color="primary" class="linea"></ion-item>
 
-  <ion-item lines="none">
-    <ion-buttons slot="start">
-      <ion-button slot="icon-only">
-        <ion-icon name="information-circle" color="medium"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+  <form #formulario="ngForm">
+    <ion-item lines="none">
+      <app-boton-info titulo="Numero de empleado" color="medium"></app-boton-info>
+      <ion-input type="number" 
+                 placeholder="Num. Empleado" 
+                 [(ngModel)]="numero" 
+                 name="numero"
+                 required>
+                </ion-input>
+    </ion-item>
+  
+    <ion-item lines="none">
+      <app-boton-info titulo="Contraseña" color="medium"></app-boton-info>
+      <ion-input [type]="passwordV" 
+                 placeholder="Contraseña" 
+                 [(ngModel)]="password" 
+                 name="contraseña"
+                 required>
+                </ion-input>
+      <ion-buttons slot="end">
+        <ion-button slot="icon-only" (click)="passwordVisible()">
+          <ion-icon [name]="visible" color="medium"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
 
-    <ion-input type="number" placeholder="Numero Empleado"></ion-input>
-  </ion-item>
+    <ion-item *ngIf="logInvalido" lines="none" class="menosTop">
+      <ion-label class="centrar ion-text-wrap advertencia">
+        El numero de empleado y la contraseña no concuerdan, revisalos bien e intenta de nuevo
+      </ion-label>
+    </ion-item>
 
-  <ion-item lines="none">
-    <ion-buttons slot="start">
-      <ion-button slot="icon-only">
-        <ion-icon name="information-circle" color="medium"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <br *ngIf="!logInvalido">
 
-    <ion-input [type]="passwordV" placeholder="Contraseña"></ion-input>
-
-    <ion-buttons slot="end">
-      <ion-button slot="icon-only" (click)="passwordVisible()">
-        <ion-icon [name]="visible" color="medium"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-item>
-
-  <p></p>
-  <ion-item lines="none">
-    <ion-label class="centrar"><a href="">¿Olvidaste tu contraseña?</a></ion-label>
-  </ion-item>
-
-  <ion-button class="centrari boton1">Ingresar</ion-button>
+    <ion-item lines="none">
+      <ion-label class="centrar"><a (click)="restablecer()">¿Olvidaste tu contraseña?</a></ion-label>
+    </ion-item>
+  
+    <ion-button class="centrari boton1" (click)="login()" [disabled]="formulario.invalid">Ingresar</ion-button>
+  </form>
+  
 
 </ion-content>

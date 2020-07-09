@@ -1,0 +1,10 @@
+[
+    {
+        "titulo": "Numero de empleado",
+        "mensaje": "En este campo debes ingresar tu numero de empleado asignado"
+    },
+    {
+        "titulo": "Contraseña",
+        "mensaje": "En este campo debes ingresar la contraseña que pertenece a tu cuenta para poder ingresar"
+    }
+]
