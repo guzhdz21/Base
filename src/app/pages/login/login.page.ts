@@ -3,8 +3,6 @@ import { FireService } from '../../services/fire.service';
 import { Usuario } from '../../interfaces/interfaces';
 import { Router } from '@angular/router';
 import { AccionesService } from '../../services/acciones.service';
-import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
-import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -26,13 +24,12 @@ export class LoginPage implements OnInit {
 
   constructor(private fireService: FireService,
               private router: Router,
-              private accionesService: AccionesService,
-              private modalCtrl: ModalController) { }
+              private accionesService: AccionesService) { }
 
   ngOnInit() {
     this.fireService.getAllUsuarios().subscribe(res => {
       this.usuarios = res;
-    })
+    });
   }
 
   passwordVisible() {
@@ -51,9 +48,10 @@ export class LoginPage implements OnInit {
     for(var user of this.usuarios) {
       if(user.numero == this.numero && user.contraseña == this.password) {
         this.usuario = user;
+        // @ts-ignore
         this.idUsuario = user.id;
         await this.accionesService.presentLoading("Entrando...", 900);
-        console.log('bienvenido ' + this.idUsuario);
+        console.log('bienvenido ' + this.usuario.nacimiento);
         this.logInvalido = false;
         this.router.navigate(["/home"]);
         return;
@@ -65,9 +63,13 @@ export class LoginPage implements OnInit {
   }
 
   async restablecer() {
-    const modal = await this.modalCtrl.create({
-      component: RecuperarPasswordPage
-    });
-    await modal.present();
+    this.router.navigate(["recuperar-password"]);
+  }
+
+  ionViewWillEnter() {
+    this.numero = null;
+    this.password = "";
+    this.visible = "eye-off";
+    this.passwordV = "password";
   }
 }

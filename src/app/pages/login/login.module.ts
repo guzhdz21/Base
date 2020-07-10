@@ -8,20 +8,14 @@ import { LoginPageRoutingModule } from './login-routing.module';
 
 import { LoginPage } from './login.page';
 import { ComponentsModule } from '../../components/components.module';
-import { RecuperarPasswordPage } from '../recuperar-password/recuperar-password.page';
-import { RecuperarPasswordPageModule } from '../recuperar-password/recuperar-password.module';
 
 @NgModule({
-  entryComponents: [
-    RecuperarPasswordPage
-  ],
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     LoginPageRoutingModule,
-    ComponentsModule,
-    RecuperarPasswordPageModule
+    ComponentsModule
   ],
   declarations: [LoginPage]
 })

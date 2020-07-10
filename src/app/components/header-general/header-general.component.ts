@@ -18,7 +18,6 @@ export class HeaderGeneralComponent implements OnInit {
   ngOnInit() {}
 
   regresar() {
-    this.modalCtrl.dismiss();
     this.router.navigate([this.ruta]);
   }
 }
