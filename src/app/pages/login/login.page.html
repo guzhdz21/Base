@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header no-border>
   <ion-toolbar color="primary">
     <ion-title class="centrar">Iniciar Sesión</ion-title>
   </ion-toolbar>
@@ -39,7 +39,7 @@
 
     <ion-item *ngIf="logInvalido" lines="none" class="menosTop">
       <ion-label class="centrar ion-text-wrap advertencia">
-        El numero de empleado y la contraseña no concuerdan, revisalos bien e intenta de nuevo
+        {{textoError}}
       </ion-label>
     </ion-item>
 

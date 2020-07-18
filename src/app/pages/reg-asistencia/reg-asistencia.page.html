@@ -1,0 +1,52 @@
+<app-header-modal titulo="Registro de Asistencia" ruta="/home-guardia"></app-header-modal>
+
+<ion-content>
+  <ion-item lines="none"> 
+    <ion-label class="explicacion ion-text-wrap">Tomate y sube una foto con 
+      tu uniforme y una foto del lugar correspondiente al servicio para registrar tu asistencia
+    </ion-label>
+  </ion-item>
+
+  <ion-icon name="location" color="primary" class="centrari icono1"></ion-icon>
+
+  <ion-list>
+    <ion-item>
+        <ion-label color="primary">Servicio:</ion-label>
+        <ion-label class="margentexto ion-text-wrap">{{servicioText}}</ion-label>
+    </ion-item>
+
+    <ion-item color="light">
+        <ion-label color="primary">Hora Asignada:</ion-label>
+        <ion-datetime class="margentexto"
+                      displayFormat="HH:mm"
+                      [value]="horario"
+                      readonly="true">
+                    </ion-datetime>
+    </ion-item>
+
+    <ion-item >
+      <ion-label color="primary">Foto persona:</ion-label>
+      <ion-button (click)="tomarFoto1()">Tomar Foto</ion-button>
+    </ion-item>
+
+    <ion-item *ngIf="imagen1">
+      <img [src]="imagen1" *ngIf="imagen1" class="imagen">
+    </ion-item>
+
+    <ion-item color="light" lines="none">
+      <ion-label color="primary">Foto lugar:</ion-label>
+      <ion-button (click)="tomarFoto2()">Tomar Foto</ion-button>
+    </ion-item>
+
+    <ion-item *ngIf="imagen2">
+      <img [src]="imagen2" class="imagen">
+    </ion-item>
+
+  </ion-list>
+
+  <ion-button class="centrari boton1"
+              [disabled]="this.fotouni || this.fotolugar" 
+              (click)="registrar()">
+              Registrar</ion-button>
+
+</ion-content>

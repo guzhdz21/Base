@@ -1,0 +1,69 @@
+<app-header-menu titulo="Global Fhas" tipo="guardia"></app-header-menu>
+
+<ion-content>
+    <ion-toolbar>
+        <ion-segment (ionChange)="segment($event)" value="Asistencia">
+            <ion-segment-button value="Asistencia">
+              <ion-label>Asistencia</ion-label>
+            </ion-segment-button>
+
+            <ion-segment-button value="Reportar">
+              <ion-label>Reportar</ion-label>
+            </ion-segment-button>
+
+            <ion-segment-button value="Asignaciones">
+                <ion-label>Asignaciones</ion-label>
+              </ion-segment-button>
+          </ion-segment>
+    </ion-toolbar>
+
+    <ion-item lines="none"> 
+        <ion-badge color="primary" class="centrari">{{titulo}}</ion-badge>
+    </ion-item>
+
+    <ion-icon [name]="icono" color="primary" class="centrari icono1"></ion-icon>
+      
+    <div *ngIf="titulo == 'Informacion General'">
+        <ion-list>
+            <ion-item>
+                <ion-label color="primary">Numero de empleado:</ion-label>
+                <ion-label class="margentexto ion-text-wrap">{{usuario.numero}}</ion-label>
+            </ion-item>
+          
+            <ion-item color="light">
+                <ion-label color="primary">Nombre:</ion-label>
+                <ion-label class="margentexto ion-text-wrap">{{usuario.nombre}}</ion-label>
+            </ion-item>
+    
+            <ion-item>
+                <ion-label color="primary">Cargo:</ion-label>
+                <ion-label class="margentexto ion-text-wrap">{{usuario.tipo}}</ion-label>
+            </ion-item>
+    
+            <ion-item color="light">
+                <ion-label color="primary">Nacimiento:</ion-label>
+                <ion-datetime class="margentexto"
+                              displayFormat="MMM DD, YYYY"
+                              monthShortNames="Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre"
+                              [value]="nacimiento"
+                              readonly="true">
+                            </ion-datetime>
+            </ion-item>
+    
+            <ion-item>
+                <ion-label color="primary">Servicio:</ion-label>
+                <ion-label class="margentexto ion-text-wrap">{{servicioText}}</ion-label>
+            </ion-item>
+    
+            <ion-item color="light">
+                <ion-label color="primary">Supervisor:</ion-label>
+                <ion-label class="margentexto ion-text-wrap">{{supervisor}}</ion-label>
+            </ion-item>
+        </ion-list>
+
+        <br>
+    
+        <ion-button class="centrari boton1" (click)="abrirRegistroAsistencia()" >Registrar asistencia</ion-button>
+    </div>
+
+</ion-content>

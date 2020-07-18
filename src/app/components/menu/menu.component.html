@@ -1,0 +1,38 @@
+<ion-menu side="start"
+          menuId="MenuPrincipal"
+          contentId="Principal">
+  
+  <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menú</ion-title>
+      </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+
+    <ion-menu-toggle>
+
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <img src="/assets/images/Logo.JPG">
+        </ion-avatar>
+        <ion-label>{{nombre}}</ion-label>
+      </ion-item>
+        
+      </ion-menu-toggle>
+      
+      <ion-list>
+        <ion-menu-toggle *ngFor="let opcion of opciones">
+          <ion-item (click)="redirigir(opcion.nombre, opcion.irA)">
+            <ion-icon color="primary" 
+                      [name]="opcion.icono" 
+                      slot="start"
+                      class="masleft"></ion-icon>
+            <ion-label>{{opcion.nombre}}</ion-label>
+          </ion-item>
+
+        </ion-menu-toggle> 
+      </ion-list>
+
+  </ion-content>
+</ion-menu>

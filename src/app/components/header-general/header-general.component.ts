@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,8 +11,7 @@ export class HeaderGeneralComponent implements OnInit {
   @Input() titulo: string;
   @Input() ruta: string;
 
-  constructor(private modalCtrl: ModalController,
-              private router: Router) { }
+  constructor(private router: Router) { }
 
   ngOnInit() {}
 

@@ -19,9 +19,7 @@ export class BotonInfoComponent implements OnInit {
               private alertasInfoService: AlertasInfoService) { }
 
   ngOnInit() {
-    this.jsonsService.getAlertasJson().subscribe(val => {
-      this.alertasInfo = val;
-    });
+    this.obtenerAlertas();
   }
 
   botonInfo(titulo: string) {
@@ -31,5 +29,11 @@ export class BotonInfoComponent implements OnInit {
         return;
       }
     }
+  }
+
+  obtenerAlertas(){
+    this.jsonsService.getAlertasJson().subscribe(val => {
+      this.alertasInfo = val;
+    });
   }
 }
