@@ -61,9 +61,18 @@
             </ion-item>
         </ion-list>
 
-        <br>
+        <ion-item *ngIf="asistenciaRegistrada || tiempo" lines="none">
+            <ion-label class="centrar ion-text-wrap textoExtra">
+              {{textoBoton}}
+            </ion-label>
+          </ion-item>
+      
+          <br *ngIf="!asistenciaRegistrada && !tiempo">
     
-        <ion-button class="centrari boton1" (click)="abrirRegistroAsistencia()" >Registrar asistencia</ion-button>
+        <ion-button class="centrari boton1" 
+                    (click)="abrirRegistroAsistencia()" 
+                    [disabled]="tiempo || asistenciaRegistrada">
+                    Registrar asistencia</ion-button>
     </div>
 
 </ion-content>

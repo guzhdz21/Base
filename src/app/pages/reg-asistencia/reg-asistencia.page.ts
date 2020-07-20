@@ -119,8 +119,17 @@ export class RegAsistenciaPage implements OnInit {
 
   async ionViewDidEnter() {
     this.backButtonSub = this.plt.backButton.subscribeWithPriority( 10000, async () => {
-      this.modalCtrl.dismiss();
+      this.modalCtrl.dismiss({
+        registrado: false
+      });
       this.router.navigate(["/home-guardia"]);
     });
+  }
+
+  regresar() {
+    this.modalCtrl.dismiss({
+      registrado: false
+    });
+    this.router.navigate(["/login"]);
   }
 }

@@ -4,7 +4,7 @@ import { StorageService } from '../../services/storage.service';
 import { FireService } from '../../services/fire.service';
 import { ModalController, Platform } from '@ionic/angular';
 import { RegAsistenciaPage } from '../reg-asistencia/reg-asistencia.page';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-home-guardia',
@@ -17,20 +17,26 @@ export class HomeGuardiaPage implements OnInit {
   reportarS: boolean = false;
   asignacionesS: boolean = false;
   titulo: string = "Informacion General";
-  icono: string = "document-text"
+  icono: string = "document-text";
+  textoBoton: string = "";
   nacimiento: string = new Date().toISOString();
   servicioText: string = "";
   supervisor: string = "";
 
   asistenciaRegistrada: boolean = false;
+  tiempo: boolean = false;
+  timer;
 
-  usuario: Usuario = {
+  usuarioLocal: Usuario;
+
+  usuario : Usuario = {
     contraseña: null,
     nacimiento: null,
     nombre: null,
     numero: null,
     tipo: null,
   }
+
   seguridad: Seguridad;
 
   cliente: Cliente;
@@ -46,14 +52,34 @@ export class HomeGuardiaPage implements OnInit {
               private plt: Platform) { }
 
   async ngOnInit() {
-    await this.obtenerUsuario();
+    await this.obtenerUsuarioLocal();
     await this.obtenerNacimiento();
+
+    this.timer = interval(10000);
+    const timersub = this.timer.subscribe(x => {
+      if(this.tiempo == true) {
+        timersub.unsubscribe();
+      } else {
+        this.checarTiempo();
+      }
+    });
   }
 
-  async obtenerUsuario() {
+  async obtenerUsuarioLocal() {
     await this.storageService.cargarUsuario().then(res => {
-      this.usuario = res;
-      this.obtenerSeguridad(res);
+      this.usuarioLocal = res;
+      this.storageService.cargarId().then(res2 => {
+        this.obtenerUsuario(res2);
+      })
+    });
+  }
+
+  async obtenerUsuario(id: string) {
+    await this.fireService.getUsuario(id).then(res => {
+      res.subscribe(val => {
+        this.usuario = val;
+        this.obtenerSeguridad(val);
+      });
     });
   }
 
@@ -63,9 +89,11 @@ export class HomeGuardiaPage implements OnInit {
         for(var seg of val) {
           if(usuario.numero == seg.numero) {
             this.seguridad = seg;
+            this.servicioText = "";
             this.servicioText += seg.servicio.cliente + " - ";
             this.obtenerSupervisor(seg);
             this.obtnerClientes(seg);
+            this.checarTiempoInicial(seg);
             break;
           }
         }
@@ -108,6 +136,62 @@ export class HomeGuardiaPage implements OnInit {
 
   async obtenerNacimiento() {
     this.nacimiento = await this.storageService.cargarNacimiento();
+  }
+
+  checarTiempoInicial(seguridad: Seguridad) {
+    var tiempo = new Date();
+    var hora = tiempo.getHours();
+    var minutos = tiempo.getMinutes();
+    var horaA = this.seguridad.servicio.horario.hora + 1;
+
+    if(horaA == 25) {
+      horaA = 0;
+      if(horaA >= hora) {
+        if(seguridad.servicio.horario.minutos < minutos) {
+          this.tiempo = true;
+          this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
+        }
+      }
+      return;
+    }
+
+    if(horaA <= hora) {
+      if(seguridad.servicio.horario.minutos < minutos) {
+        this.tiempo = true;
+        this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
+      }
+      return;
+    }
+
+  }
+
+  checarTiempo() {
+    if(this.seguridad) {
+      var tiempo = new Date();
+      var hora = tiempo.getHours();
+      var minutos = tiempo.getMinutes();
+      var horaA = this.seguridad.servicio.horario.hora + 1;
+
+      if(horaA == 25) {
+        horaA = 0;
+        if(horaA >= hora) {
+          if(this.seguridad.servicio.horario.minutos < minutos) {
+            this.tiempo = true;
+            this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
+          }
+        }
+        return;
+      }
+
+      if(horaA <= hora) {
+        if(this.seguridad.servicio.horario.minutos < minutos) {
+          this.tiempo = true;
+          this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
+        }
+        return;
+      }
+
+    }
   }
 
   segment(event) {
