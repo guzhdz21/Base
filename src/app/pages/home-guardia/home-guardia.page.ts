@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Usuario, Seguridad, Cliente, Servicio } from '../../interfaces/interfaces';
 import { StorageService } from '../../services/storage.service';
 import { FireService } from '../../services/fire.service';
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController, Platform, NavController } from '@ionic/angular';
 import { RegAsistenciaPage } from '../reg-asistencia/reg-asistencia.page';
 import { Subscription, interval } from 'rxjs';
 import { Router } from '@angular/router';
@@ -53,12 +53,20 @@ export class HomeGuardiaPage implements OnInit {
   autentificacion;
   correcto: boolean = true;
 
+  usuarioFake: Usuario = {
+    contraseña: null,
+    nacimiento: null,
+    nombre: null,
+    numero: null,
+    tipo: null,
+  }
+
 
   constructor(private storageService: StorageService,
               private fireService: FireService,
               private modalCtrl: ModalController,
               private plt: Platform,
-              private router: Router,
+              private navCtrl: NavController,
               private accionesService: AccionesService) { }
 
   async ngOnInit() {
@@ -75,14 +83,12 @@ export class HomeGuardiaPage implements OnInit {
     });
 
     this.autentificacion = interval(5000);
-    const autenSub = this.autentificacion.subscribe(x => {
+    const autenSub = await this.autentificacion.subscribe(x => {
       this.auntentificacion();
       if(!this.correcto) {
         autenSub.unsubscribe();
         timersub.unsubscribe();
-        this.accionesService.presentAlertGenerica("Alerta de Seguridad", "Algunos de tus datos indispenables" 
-        + " (contraseña, numero, etc..) han sido modificados, por seguridad tendras que volver a ingresar a tu cuenta");
-        this.router.navigate(["/login"]);
+        this.procesoSalida();
       }
     });
   }
@@ -237,7 +243,7 @@ export class HomeGuardiaPage implements OnInit {
 
   async auntentificacion() {
     if(this.usuarioLocal != null && this.id != null) {
-      this.fireService.getUsuario(this.id).then(res => {
+      await this.fireService.getUsuario(this.id).then(res => {
         res.subscribe(val => {
           if(val) {
             if(val.numero != this.usuarioLocal.numero 
@@ -250,6 +256,15 @@ export class HomeGuardiaPage implements OnInit {
         });
       });
     }
+  }
+
+  async procesoSalida() {
+    await this.accionesService.presentAlertGenerica("Alerta de Seguridad", "Algunos de tus datos indispenables" 
+        + " (contraseña, numero, etc..) han sido modificados, por seguridad tendras que volver a ingresar a tu cuenta");
+    await this.storageService.guardarId(null);
+    await this.storageService.guardarUsuario(this.usuarioFake);
+    await this.storageService.guardarNacimiento(null);
+    this.navCtrl.navigateRoot("/login");
   }
 
   segment(event) {

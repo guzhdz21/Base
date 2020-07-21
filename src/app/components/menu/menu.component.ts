@@ -30,8 +30,10 @@ export class MenuComponent implements OnInit {
   }
 
   async cargarUsuario() {
-    this.usuario = await this.storage.cargarUsuario();
-    this.nombre = this.usuario.nombre;
+    await this.storage.cargarUsuario().then(res => {
+      this.usuario = res;
+      this.nombre = res.nombre;
+    });
     switch(this.tipo) {
 
       case 'guardia': {
