@@ -5,6 +5,8 @@ import { FireService } from '../../services/fire.service';
 import { ModalController, Platform } from '@ionic/angular';
 import { RegAsistenciaPage } from '../reg-asistencia/reg-asistencia.page';
 import { Subscription, interval } from 'rxjs';
+import { Router } from '@angular/router';
+import { AccionesService } from '../../services/acciones.service';
 
 @Component({
   selector: 'app-home-guardia',
@@ -13,22 +15,27 @@ import { Subscription, interval } from 'rxjs';
 })
 export class HomeGuardiaPage implements OnInit {
 
+  //Variables visuales generales
   asistenciaS: boolean = true;
   reportarS: boolean = false;
   asignacionesS: boolean = false;
   titulo: string = "Informacion General";
   icono: string = "document-text";
+
+  //Variables visuales de asistencia
   textoBoton: string = "";
   nacimiento: string = new Date().toISOString();
   servicioText: string = "";
   supervisor: string = "";
+  horasS: number = null;
 
+  //Varibales del boton asistencia
   asistenciaRegistrada: boolean = false;
   tiempo: boolean = false;
   timer;
 
-  usuarioLocal: Usuario;
-
+  //Variables de los datos del usuario
+  usuarioLocal: Usuario = null;
   usuario : Usuario = {
     contraseña: null,
     nacimiento: null,
@@ -36,20 +43,23 @@ export class HomeGuardiaPage implements OnInit {
     numero: null,
     tipo: null,
   }
-
   seguridad: Seguridad;
-
   cliente: Cliente;
-
   servicio: Servicio;
+  id: string = null;
 
+  //Variables de funcionalidad
   backButtonSub: Subscription;
+  autentificacion;
+  correcto: boolean = true;
 
 
   constructor(private storageService: StorageService,
               private fireService: FireService,
               private modalCtrl: ModalController,
-              private plt: Platform) { }
+              private plt: Platform,
+              private router: Router,
+              private accionesService: AccionesService) { }
 
   async ngOnInit() {
     await this.obtenerUsuarioLocal();
@@ -63,12 +73,25 @@ export class HomeGuardiaPage implements OnInit {
         this.checarTiempo();
       }
     });
+
+    this.autentificacion = interval(5000);
+    const autenSub = this.autentificacion.subscribe(x => {
+      this.auntentificacion();
+      if(!this.correcto) {
+        autenSub.unsubscribe();
+        timersub.unsubscribe();
+        this.accionesService.presentAlertGenerica("Alerta de Seguridad", "Algunos de tus datos indispenables" 
+        + " (contraseña, numero, etc..) han sido modificados, por seguridad tendras que volver a ingresar a tu cuenta");
+        this.router.navigate(["/login"]);
+      }
+    });
   }
 
   async obtenerUsuarioLocal() {
     await this.storageService.cargarUsuario().then(res => {
       this.usuarioLocal = res;
       this.storageService.cargarId().then(res2 => {
+        this.id = res2;
         this.obtenerUsuario(res2);
       })
     });
@@ -91,8 +114,9 @@ export class HomeGuardiaPage implements OnInit {
             this.seguridad = seg;
             this.servicioText = "";
             this.servicioText += seg.servicio.cliente + " - ";
+            this.horasS = seg.servicio.tipo;
             this.obtenerSupervisor(seg);
-            this.obtnerClientes(seg);
+            this.obtenerClientes(seg);
             this.checarTiempoInicial(seg);
             break;
           }
@@ -114,7 +138,7 @@ export class HomeGuardiaPage implements OnInit {
     });
   }
 
-  async obtnerClientes(seguridad: Seguridad) {
+  async obtenerClientes(seguridad: Seguridad) {
     await this.fireService.getAllClientes().then(res => {
       res.subscribe(val => {
         for(var cli of val) {
@@ -194,6 +218,40 @@ export class HomeGuardiaPage implements OnInit {
     }
   }
 
+  async abrirRegistroAsistencia() {
+    const modal = await this.modalCtrl.create({
+      component: RegAsistenciaPage,
+      componentProps: {
+        servicioText: this.servicioText,
+        hora: this.seguridad.servicio.horario.hora,
+        minutos: this.seguridad.servicio.horario.minutos,
+        servicio: this.seguridad.servicio,
+        numero: this.usuario.numero
+      }
+    });
+    await modal.present();
+    const {data}  = await modal.onDidDismiss();
+    this.asistenciaRegistrada = data.registrado;
+    this.textoBoton = "Ya has registrado tu aistencia de hoy";
+  }
+
+  async auntentificacion() {
+    if(this.usuarioLocal != null && this.id != null) {
+      this.fireService.getUsuario(this.id).then(res => {
+        res.subscribe(val => {
+          if(val) {
+            if(val.numero != this.usuarioLocal.numero 
+              || this.usuarioLocal.contraseña != val.contraseña 
+              || val.tipo != "Elemento seguridad") {
+                this.correcto = false;
+                return false;
+            }
+          }
+        });
+      });
+    }
+  }
+
   segment(event) {
     switch (event.detail.value) {
 
@@ -225,22 +283,6 @@ export class HomeGuardiaPage implements OnInit {
       }
 
     }
-  }
-
-  async abrirRegistroAsistencia() {
-    const modal = await this.modalCtrl.create({
-      component: RegAsistenciaPage,
-      componentProps: {
-        servicioText: this.servicioText,
-        hora: this.seguridad.servicio.horario.hora,
-        minutos: this.seguridad.servicio.horario.minutos,
-        servicio: this.seguridad.servicio,
-        numero: this.usuario.numero
-      }
-    });
-    await modal.present();
-    const {data}  = await modal.onDidDismiss();
-    this.asistenciaRegistrada = data.registrado;
   }
 
   async ionViewDidEnter() {

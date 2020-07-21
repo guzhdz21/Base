@@ -130,6 +130,6 @@ export class RegAsistenciaPage implements OnInit {
     this.modalCtrl.dismiss({
       registrado: false
     });
-    this.router.navigate(["/login"]);
+    this.router.navigate(["/home-guardia"]);
   }
 }

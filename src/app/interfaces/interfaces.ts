@@ -46,6 +46,7 @@ export interface ServicioA {
     cliente: string;
     servicio: number;
     horario: Hora;
+    tipo: number;
 }
 
 export interface Hora {
