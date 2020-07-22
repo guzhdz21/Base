@@ -3,7 +3,7 @@ import { StorageService } from '../../services/storage.service';
 import { Usuario } from '../../interfaces/interfaces';
 import { Router } from '@angular/router';
 import { FireService } from '../../services/fire.service';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { Platform } from '@ionic/angular';
 
 @Component({
@@ -14,7 +14,12 @@ import { Platform } from '@ionic/angular';
 export class BienvenidaPage implements OnInit {
 
   UsuarioLocal: Usuario;
+  usuarios: Usuario[];
+  usuario: Usuario;
   backButtonSub: Subscription;
+
+  timer;
+  timerSub;
 
   constructor(private storage: StorageService,
               private router: Router,
@@ -22,39 +27,49 @@ export class BienvenidaPage implements OnInit {
               private plt: Platform) { }
 
   async ngOnInit() {
-    this.UsuarioLocal = await this.storage.cargarUsuario();
-    await this.checarUsuario();
-  }
-
-  async checarUsuario() {
-    await this.fireService.getAllUsuarios().then(res => {
-      res.subscribe(val => {
-        if(this.UsuarioLocal != null) {
-          for(var user of val) {
-            if(user.numero == this.UsuarioLocal.numero && user.contraseña == this.UsuarioLocal.contraseña) {
-              this.UsuarioLocal = user;
-              this.storage.guardarUsuario(this.UsuarioLocal);
-              this.storage.guardarNacimiento(user.nacimiento.toDate().toISOString());
-              // @ts-ignore
-              this.storage.guardarId(user.id);
-              this.seleccionarHome(this.UsuarioLocal.tipo);
-              return;
+    await this.storage.cargarUsuario().then(res => {
+      this.UsuarioLocal = res;
+      this.fireService.getAllUsuarios().then(res2 => {
+        res2.subscribe(val => {
+          if(res) {
+            for(var user of val) {
+              if(user.numero == res.numero && user.contraseña == res.contraseña) {
+                this.usuario = user;
+                return;
+              }
             }
           }
+        });
+      });
+    });
+
+    this.timer = interval(1000);
+    this.timerSub = this.timer.subscribe(x => {
+      if(this.usuario) {
+        if(this.usuario.numero == this.UsuarioLocal.numero && this.usuario.contraseña == this.UsuarioLocal.contraseña) {
+          this.UsuarioLocal = this.usuario;
+          this.storage.guardarNacimiento(this.usuario.nacimiento.toDate().toISOString());
+          // @ts-ignore
+          this.storage.guardarId(this.usuario.id);
+          this.seleccionarHome(this.usuario.tipo);
+          this.timerSub.unsubscribe();
+          return;
         }
+      } else {
         this.router.navigate(["/login"]);
-        return;
-      }) 
+        this.timerSub.unsubscribe();
+      }
     });
   }
   
   seleccionarHome(tipo: string) {
     switch (tipo) {
       case 'Elemento seguridad': {
-        console.log("entre");
         this.router.navigate(["/home-guardia"]);
+        break;
       }
     }
+    return;
   }
 
   async ionViewDidEnter() {
