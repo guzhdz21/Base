@@ -21,6 +21,10 @@ export interface Seguridad {
     supervisor: number;
 }
 
+export interface recursosHumanos {
+    numero: number;
+}
+
 export interface Asistencia {
     dia: Timestamp;
     fotos: {
