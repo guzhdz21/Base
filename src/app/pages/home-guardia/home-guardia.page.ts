@@ -33,6 +33,7 @@ export class HomeGuardiaPage implements OnInit {
   asistenciaRegistrada: boolean = false;
   tiempo: boolean = false;
   timer;
+  timerSub;
 
   //Variables de los datos del usuario
   usuarioLocal: Usuario = null;
@@ -51,6 +52,7 @@ export class HomeGuardiaPage implements OnInit {
   //Variables de funcionalidad
   backButtonSub: Subscription;
   autentificacion;
+  autenSub;
   correcto: boolean = true;
 
   usuarioFake: Usuario = {
@@ -61,6 +63,7 @@ export class HomeGuardiaPage implements OnInit {
     tipo: null,
   }
 
+  user: Usuario;
 
   constructor(private storageService: StorageService,
               private fireService: FireService,
@@ -74,22 +77,17 @@ export class HomeGuardiaPage implements OnInit {
     await this.obtenerNacimiento();
 
     this.timer = interval(10000);
-    const timersub = this.timer.subscribe(x => {
+    this.timerSub = this.timer.subscribe(x => {
       if(this.tiempo == true) {
-        timersub.unsubscribe();
+        this.timerSub.unsubscribe();
       } else {
         this.checarTiempo();
       }
     });
 
     this.autentificacion = interval(5000);
-    const autenSub = await this.autentificacion.subscribe(x => {
-      this.auntentificacion();
-      if(!this.correcto) {
-        autenSub.unsubscribe();
-        timersub.unsubscribe();
-        this.procesoSalida();
-      }
+    this.autenSub = await this.autentificacion.subscribe(x => {
+      this.cargarUsuarioComparar();
     });
   }
 
@@ -241,21 +239,30 @@ export class HomeGuardiaPage implements OnInit {
     this.textoBoton = "Ya has registrado tu aistencia de hoy";
   }
 
-  async auntentificacion() {
+  async cargarUsuarioComparar() {
     if(this.usuarioLocal != null && this.id != null) {
-      await this.fireService.getUsuario(this.id).then(res => {
+      this.fireService.getUsuario(this.id).then(res => {
         res.subscribe(val => {
-          if(val) {
-            if(val.numero != this.usuarioLocal.numero 
-              || this.usuarioLocal.contraseña != val.contraseña 
-              || val.tipo != "Elemento seguridad") {
-                this.correcto = false;
-                return false;
-            }
-          }
+          this.user = val;
         });
       });
+      this.autentificar();
     }
+    return;
+  }
+
+  async autentificar() {
+    if(this.user && this.usuarioLocal != null) {
+      if(this.user.numero != this.usuarioLocal.numero 
+        || this.usuarioLocal.contraseña != this.user.contraseña 
+        || this.user.tipo != "Elemento seguridad") {
+        await this.autenSub.unsubscribe();
+        await this.timerSub.unsubscribe();
+        await this.procesoSalida();
+        await this.navCtrl.navigateRoot("/login");
+      }
+    }
+    return;
   }
 
   async procesoSalida() {
@@ -264,7 +271,7 @@ export class HomeGuardiaPage implements OnInit {
     await this.storageService.guardarId(null);
     await this.storageService.guardarUsuario(this.usuarioFake);
     await this.storageService.guardarNacimiento(null);
-    this.navCtrl.navigateRoot("/login");
+    return;
   }
 
   segment(event) {

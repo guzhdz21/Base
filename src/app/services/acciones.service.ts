@@ -34,5 +34,6 @@ export class AccionesService {
     });
     alert.present();
     await alert.onDidDismiss();
+    return;
   }
 }
