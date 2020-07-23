@@ -31,6 +31,10 @@ const routes: Routes = [
     path: 'reg-asistencia',
     loadChildren: () => import('./pages/reg-asistencia/reg-asistencia.module').then( m => m.RegAsistenciaPageModule)
   },
+  {
+    path: 'home-rh',
+    loadChildren: () => import('./pages/home-rh/home-rh.module').then( m => m.HomeRHPageModule)
+  },
 ];
 
 @NgModule({
