@@ -30,6 +30,7 @@ export interface Asistencia {
     horario: Hora;
     numero: number;
     servicio: ServicioA;
+    retardo: boolean;
 }
 
 export interface Cliente {

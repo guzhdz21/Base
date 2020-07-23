@@ -92,13 +92,28 @@ export class RegAsistenciaPage implements OnInit {
     var año = fecha.getFullYear();
     var mes = fecha.getMonth();
     var dia = fecha.getDate();
+    var fecha2 = new Date(año, mes, dia, 0, 0, 0, 0);
+
     var hora = fecha.getHours();
     var minutos = fecha.getMinutes();
     var horario: Hora = {
       hora: hora,
       minutos: minutos
     }
-    var fecha2 = new Date(año, mes, dia, 0, 0, 0, 0);
+
+    var retardo = false;
+    var horaRetardo = this.servicio.horario.hora;
+    var minutosRetardo = this.servicio.horario.minutos + 20;
+    if(minutosRetardo > 59) {
+      horaRetardo += 1;
+      minutosRetardo -= 60;
+      if(horaRetardo == 25) {
+        horaRetardo = 0;
+      }
+    }
+    if(horario.hora == horaRetardo && horario.minutos > minutosRetardo) {
+      retardo = true;
+    }
 
     var asistencia: Asistencia = {
       // @ts-ignore
@@ -109,7 +124,8 @@ export class RegAsistenciaPage implements OnInit {
       },
       horario: horario,
       numero: this.numero,
-      servicio: this.servicio
+      servicio: this.servicio,
+      retardo: retardo
     }
     await this.fireService.addAsistencias(asistencia);
     this.modalCtrl.dismiss( {

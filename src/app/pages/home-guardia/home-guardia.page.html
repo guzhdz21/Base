@@ -23,7 +23,7 @@
 
     <ion-icon [name]="icono" color="primary" class="centrari icono1"></ion-icon>
       
-    <div *ngIf="titulo == 'Informacion General'">
+    <div *ngIf="titulo == 'Informacion General' && existe">
         <ion-list>
             <ion-item>
                 <ion-label color="primary">Numero de empleado:</ion-label>
@@ -71,7 +71,7 @@
     
         <ion-button class="centrari boton1" 
                     (click)="abrirRegistroAsistencia()" 
-                    [disabled]="tiempo || asistenciaRegistrada">
+                    [disabled]="tiempo || asistenciaRegistrada || sinServicio">
                     Registrar asistencia</ion-button>
     </div>
 

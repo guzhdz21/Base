@@ -14,8 +14,9 @@ import { Platform } from '@ionic/angular';
 export class BienvenidaPage implements OnInit {
 
   UsuarioLocal: Usuario;
-  usuarios: Usuario[];
   usuario: Usuario;
+  noLogin: boolean = false;
+
   backButtonSub: Subscription;
 
   timer;
@@ -38,22 +39,27 @@ export class BienvenidaPage implements OnInit {
                 return;
               }
             }
+            this.noLogin = true;
+          } else {
+            this.noLogin = true;
           }
         });
       });
     });
 
-    this.timer = interval(1000);
+    this.timer = interval(1500);
     this.timerSub = this.timer.subscribe(x => {
-      if(this.usuario) {
-        if(this.usuario.numero == this.UsuarioLocal.numero && this.usuario.contraseña == this.UsuarioLocal.contraseña) {
-          this.UsuarioLocal = this.usuario;
-          this.storage.guardarNacimiento(this.usuario.nacimiento.toDate().toISOString());
-          // @ts-ignore
-          this.storage.guardarId(this.usuario.id);
-          this.seleccionarHome(this.usuario.tipo);
-          this.timerSub.unsubscribe();
-          return;
+      if(this.noLogin == false) {
+        if(this.usuario) {
+          if(this.usuario.numero == this.UsuarioLocal.numero && this.usuario.contraseña == this.UsuarioLocal.contraseña) {
+            this.UsuarioLocal = this.usuario;
+            this.storage.guardarNacimiento(this.usuario.nacimiento.toDate().toISOString());
+            // @ts-ignore
+            this.storage.guardarId(this.usuario.id);
+            this.seleccionarHome(this.usuario.tipo);
+            this.timerSub.unsubscribe();
+            return;
+          }
         }
       } else {
         this.router.navigate(["/login"]);
