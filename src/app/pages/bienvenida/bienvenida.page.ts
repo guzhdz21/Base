@@ -74,6 +74,10 @@ export class BienvenidaPage implements OnInit {
         this.router.navigate(["/home-guardia"]);
         break;
       }
+      case 'Recursos humanos': {
+        this.router.navigate(["/home-rh"]);
+        break;
+      }
     }
     return;
   }
