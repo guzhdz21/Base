@@ -5,6 +5,7 @@ import { ModalController, Platform, NavController } from '@ionic/angular';
 import { AccionesService } from '../../services/acciones.service';
 import { Usuario, Seguridad, Cliente, Servicio } from '../../interfaces/interfaces';
 import { Subscription, interval } from 'rxjs';
+import { stringify } from 'querystring';
 
 @Component({
   selector: 'app-home-rh',
@@ -13,19 +14,14 @@ import { Subscription, interval } from 'rxjs';
 })
 export class HomeRHPage implements OnInit {
 
+    empleados: any[] = [];
+
     //Variables visuales generales
-    asistenciaS: boolean = true;
-    reportarS: boolean = false;
-    asignacionesS: boolean = false;
     titulo: string = "Informacion General";
     icono: string = "document-text";
   
     //Variables visuales de asistencia
-    textoBoton: string = "";
     nacimiento: string = new Date().toISOString();
-    servicioText: string = "";
-    supervisor: string = "";
-    horasS: number = null;
   
     //Variables del boton asistencia
     asistenciaRegistrada: boolean = false;
@@ -42,9 +38,7 @@ export class HomeRHPage implements OnInit {
       numero: null,
       tipo: null,
     }
-    seguridad: Seguridad;
-    cliente: Cliente;
-    servicio: Servicio;
+
     id: string = null;
   
     //Variables de funcionalidad
@@ -71,15 +65,19 @@ export class HomeRHPage implements OnInit {
                 private accionesService: AccionesService) { }
   
     async ngOnInit() {
+
+      this.empleados = [];
+
       await this.obtenerUsuarioLocal();
       await this.obtenerNacimiento();
+      await this.obtenerTodosLosEmpleados();
   
       this.timer = interval(10000);
       this.timerSub = this.timer.subscribe(x => {
         if(this.tiempo == true) {
           this.timerSub.unsubscribe();
         } else {
-          this.checarTiempo();
+          //this.checarTiempo();
         }
       });
   
@@ -103,13 +101,28 @@ export class HomeRHPage implements OnInit {
       await this.fireService.getUsuario(id).then(res => {
         res.subscribe(val => {
           this.usuario = val;
-          this.obtenerSeguridad(val);
+          //this.obtenerSeguridad(val);
         });
       });
     }
-  
-    async obtenerSeguridad(usuario: Usuario) {
-      await this.fireService.getAllSeguridad().then(res => {
+
+    async obtenerTodosLosEmpleados() {
+      await this.fireService.getAllUsuarios().then(res => {
+        res.subscribe(val => {
+          this.empleados = val;
+          //this.obtenerSeguridad(val);
+        });
+      });
+    }
+
+    async eliminarEmpleado(idEmpleado: number){
+
+      await this.fireService.removeUsuario(idEmpleado.toString());
+    }
+
+    /*
+    async obtenerUsuarios(usuario: Usuario) {
+      await this.fireService.getAllUsuarios().then(res => {
         res.subscribe(val => {
           for(var seg of val) {
             if(usuario.numero == seg.numero) {
@@ -126,98 +139,13 @@ export class HomeRHPage implements OnInit {
         });
       });
     }
-  
-    async obtenerSupervisor(seguridad: Seguridad) {
-      await this.fireService.getAllUsuarios().then(res => {
-        res.subscribe(val => {
-          for(var usuario of val) {
-            if(usuario.numero == seguridad.supervisor) {
-              this.supervisor = usuario.nombre;
-              break;
-            }
-          }
-        });
-      });
-    }
-  
-    async obtenerClientes(seguridad: Seguridad) {
-      await this.fireService.getAllClientes().then(res => {
-        res.subscribe(val => {
-          for(var cli of val) {
-            if(seguridad.servicio.cliente == cli.nombre) {
-              for(var ser of cli.servicios) {
-                if(this.seguridad.servicio.servicio == ser.numero) {
-                  this.cliente = cli;
-                  this.servicio = ser;
-                  this.servicioText += ser.nombre
-                  break;
-                }
-              }
-              break;
-            }
-          }
-        });
-      });
-    }
-  
+  */
+
     async obtenerNacimiento() {
       this.nacimiento = await this.storageService.cargarNacimiento();
     }
-  
-    checarTiempoInicial(seguridad: Seguridad) {
-      var tiempo = new Date();
-      var hora = tiempo.getHours();
-      var minutos = tiempo.getMinutes();
-      var horaA = this.seguridad.servicio.horario.hora + 1;
-  
-      if(horaA == 25) {
-        horaA = 0;
-        if(horaA >= hora) {
-          if(seguridad.servicio.horario.minutos < minutos) {
-            this.tiempo = true;
-            this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
-          }
-        }
-        return;
-      }
-  
-      if(horaA <= hora) {
-        if(seguridad.servicio.horario.minutos < minutos) {
-          this.tiempo = true;
-          this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
-        }
-        return;
-      }
-    }
-  
-    checarTiempo() {
-      if(this.seguridad) {
-        var tiempo = new Date();
-        var hora = tiempo.getHours();
-        var minutos = tiempo.getMinutes();
-        var horaA = this.seguridad.servicio.horario.hora + 1;
-  
-        if(horaA == 25) {
-          horaA = 0;
-          if(horaA >= hora) {
-            if(this.seguridad.servicio.horario.minutos < minutos) {
-              this.tiempo = true;
-              this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
-            }
-          }
-          return;
-        }
 
-        if(horaA <= hora) {
-          if(this.seguridad.servicio.horario.minutos < minutos) {
-            this.tiempo = true;
-            this.textoBoton = "Ya no puedes registrar asistencia ya que la tolerancia a sido exedida"
-          }
-          return;
-        }
-      }
-    }
-
+    /*
     async abrirRegistroAsistencia() {
       const modal = await this.modalCtrl.create({
         component: RegAsistenciaPage,
@@ -234,6 +162,7 @@ export class HomeRHPage implements OnInit {
       this.asistenciaRegistrada = data.registrado;
       this.textoBoton = "Ya has registrado tu aistencia de hoy";
     }
+    */
 
     async cargarUsuarioComparar() {
       if(this.usuarioLocal != null && this.id != null) {
@@ -251,7 +180,7 @@ export class HomeRHPage implements OnInit {
       if(this.user && this.usuarioLocal != null) {
         if(this.user.numero != this.usuarioLocal.numero 
           || this.usuarioLocal.contraseña != this.user.contraseña 
-          || this.user.tipo != "Elemento seguridad") {
+          || this.user.tipo != "Recursos humanos") {
           await this.autenSub.unsubscribe();
           await this.timerSub.unsubscribe();
           await this.procesoSalida();
@@ -268,39 +197,6 @@ export class HomeRHPage implements OnInit {
       await this.storageService.guardarUsuario(this.usuarioFake);
       await this.storageService.guardarNacimiento(null);
       return;
-    }
-  
-    segment(event) {
-      switch (event.detail.value) {
-  
-        case 'Asistencia': {
-          this.asistenciaS = true;
-          this.reportarS = false;
-          this.asignacionesS = false;
-          this.titulo = "Informacion General";
-          this.icono = "document-text";
-          break;
-        }
-  
-        case 'Reportar': {
-          this.asistenciaS = false;
-          this.reportarS = true;
-          this.asignacionesS = false;
-          this.titulo = "Reportar Incidente";
-          this.icono = "megaphone"
-          break;
-        }
-  
-        case 'Asignaciones': {
-          this.asistenciaS = false;
-          this.reportarS = true;
-          this.asignacionesS = false;
-          this.titulo = "Asignaciones de la Semana";
-          this.icono = "calendar"
-          break;
-        }
-  
-      }
     }
   
     async ionViewDidEnter() {

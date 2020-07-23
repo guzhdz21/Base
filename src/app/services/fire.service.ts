@@ -59,7 +59,7 @@ export class FireService {
 
   async removeUsuario(id: string) {
     await this.fireUsuario();
-    return this.usuariosColletion.doc(id).delete()
+    return this.usuariosColletion.doc(id).delete();
   }
 
   fireSeguridad() {
