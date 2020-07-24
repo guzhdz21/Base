@@ -15,6 +15,8 @@ import { stringify } from 'querystring';
 export class HomeRHPage implements OnInit {
 
     empleados: any[] = [];
+    eliminacionConfirmada: boolean = false;
+    contraseñaConfirmada: boolean = false;
 
     //Variables visuales generales
     titulo: string = "Informacion General";
@@ -115,10 +117,21 @@ export class HomeRHPage implements OnInit {
       });
     }
 
-    async eliminarEmpleado(idEmpleado: number){
-
-      await this.fireService.removeUsuario(idEmpleado.toString());
+    async eliminarEmpleado(idEmpleado: number, nombreEmpleado: number){
+      await this.accionesService.presentAlertConfirmacionContraseña("¿Estás seguro de eliminar a " + nombreEmpleado + "?", "Ingresa tu contraseña" ,
+      [{text: 'Cancelar',handler: (bla) => { 
+        this.eliminacionConfirmada = false;
+        this.accionesService.presentToast("Eliminación cancelada");}
+      }, {text: 'Eliminar',handler: (bla) => {
+        if(bla.contraseñaConfirmacion == this.usuario.contraseña){
+          this.fireService.removeUsuario(idEmpleado.toString());
+          this.accionesService.presentToast("Empleado Eliminado");
+        } else{
+          this.accionesService.presentToast("Contraseña incorrecta");
+        } 
+      }}]);
     }
+
 
     /*
     async obtenerUsuarios(usuario: Usuario) {
